@@ -184,15 +184,15 @@ router.post("/rm", (req, res) => {
   //remove files or folders
   if (req.body.type == "file") {
     try {
-      //fs.rmSync(`${Dir}/${req.body.name}`);
+      fs.rmSync(`${Dir}/${req.body.name}`);
       req.flash("successMsg", `file ${req.body.name} removed`);
     } catch (e) {
       req.flash("errorMsg", `error on remove file ${req.body.name}`);
     }
   } else {
     try {
-      fs.rmdirSync(`${Dir}/${req.body.name}`, {
-        recursive: false,
+      fs.rmSync(`${Dir}/${req.body.name}`, {
+        recursive: true,
         force: true
       });
       req.flash("successMsg", `folder ${req.body.name} removed`);

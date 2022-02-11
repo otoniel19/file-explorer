@@ -7,7 +7,7 @@
       <p>path: {{ dir }}</p>
     </div>
     <br />
-    <form action="/rm" method="post">
+    <form action="{{ url }}/rm" method="post">
       <input type="hidden" name="name" value="{{ name }}" />
       <input type="hidden" name="type" value="{{ type }}" />
       <button type="submit" class="btn btn-danger">
