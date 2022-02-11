@@ -1,0 +1,16 @@
+<center>
+  <div class="card card-body">
+    <form action="{{ url }}/save" method="post">
+      <input
+        type="text"
+        name="name"
+        class="form form-control"
+        required
+        placeholder="{{ holderName }}"
+      />
+      <input type="hidden" name="type" value="{{ type }}" />
+      <br />
+      <button class="btn btn-success" type="submit">Create</button>
+    </form>
+  </div>
+</center>

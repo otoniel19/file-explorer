@@ -1,0 +1,15 @@
+<link rel="stylesheet" href="css/utils.css" />
+
+<div class="card card-body">
+  {{#each nav}}
+  {{#if (eq type "file")}}
+  <pre><a href="{{url}}/config={{name}}&{{type}}"><i class="fa fa-cog"></i></a> <a href="{{url}}/openFile={{name}}"><i class="{{icon}}"></i> </a><a href="{{url}}/openFile={{name}}">{{name}}</a></pre>
+  {{else}}
+  <pre><a href="{{url}}/config={{name}}&{{type}}"><i class="fa fa-cog"></i></a> <a href="{{url}}/cd={{name}}"><i class="{{icon}}"></i> {{name}}</a></pre>
+  {{/if}}
+
+  {{else}}
+  <div class="card">No Such File Or Directory</div>
+
+  {{/each}}
+</div>

@@ -1,0 +1,39 @@
+<center>
+  <div class="card card-body">
+    <div class="card-title">
+      <h1>{{ name }}</h1>
+    </div>
+    <div class="card-subtitle">
+      <p>path: {{ dir }}</p>
+    </div>
+    <br />
+    <form action="/rm" method="post">
+      <input type="hidden" name="name" value="{{ name }}" />
+      <input type="hidden" name="type" value="{{ type }}" />
+      <button type="submit" class="btn btn-danger">
+        <i class="fa fa-trash-alt"></i>
+      </button>
+    </form>
+    <br />
+    <form method="get">
+      <script>
+        function renameFunction() {
+          var newName = prompt("new name:", "{{name}}");
+          if (newName != null)
+            window.open(`{{url}}/rename={{name}}=${newName}`);
+          else alert("name cannot be null");
+        }
+      </script>
+      <button class="btn btn-warning" onclick="renameFunction()">
+        <i class="fa fa-pen"></i>
+      </button>
+    </form>
+    <br />
+    <form method="post" action="{{ url }}/zip">
+      <input name="zipName" type="hidden" value="{{ name }}" />
+      <button class="btn btn-primary">
+        <i class="fa fa-file-archive"></i>
+      </button>
+    </form>
+  </div>
+</center>

@@ -1,0 +1,24 @@
+<style>
+  button {
+    background: none;
+    border: none;
+  }
+</style>
+
+<center>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <form action="{{ url }}/create=file" method="get">
+        <button type="submit">
+          <a class="navbar"><i class="fa fa-file-plus"></i></a>
+        </button>
+      </form>
+      <a href="{{ url }}/upOneDir"><i class="fa fa-arrow-up"></i></a>
+      <form action="{{ url }}/create=folder" method="get">
+        <button type="submit">
+          <a class="navbar"><i class="fa fa-folder-plus"></i></a>
+        </button>
+      </form>
+    </div>
+  </nav>
+</center>

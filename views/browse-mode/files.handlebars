@@ -1,0 +1,15 @@
+<center>
+  <link rel="stylesheet" href="css/utils.css" />
+  <div class="card card-body">
+    <form action="{{ url }}/saveFile" method="post">
+      <input type="hidden" name="name" value="{{ name }}" />
+      <textarea name="content" rows="15" class="form form-control">{{
+        content
+      }}</textarea>
+      <br />
+      <button type="submit">
+        <i style="font-size: 50px" class="fa fa-save"></i>
+      </button>
+    </form>
+  </div>
+</center>
