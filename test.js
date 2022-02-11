@@ -12,7 +12,12 @@ app.set("views", "./views/browse-mode/");
 app.set("view engine", "handlebars");
 app.engine("handlebars", engine({ defaultLayout: "main" }));
 
-exp.config("../", "../../home/", true, true, "/", "/");
+exp.config("../", "../../home/", true, false, "/fs", "/");
 
-app.use(exp.setup);
+app.use((req, res, next) => {
+  console.log(exp.getAction());
+  next();
+});
+
+app.use("/fs", exp.router);
 app.listen(3000);

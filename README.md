@@ -31,7 +31,13 @@ app.engine("handlebars", engine({ defaultLayout: "main" }));
 
 fileExp.config("../foo", "../foo/bar", true, false, "/foo", "/bar");
 
-app.use("/foo", fileExp.setup);
+//getCurrentAction
+app.use((req, res, next) => {
+  console.log(fileExp.getAction());
+  next();
+});
+
+app.use("/foo", fileExp.router);
 
 app.listen(3000);
 ```
@@ -48,7 +54,7 @@ function config(
   root: string,
   //block acess to root dir
   lock: boolean,
-  //shoe hidden files
+  //show hidden files
   hidden: boolean,
   //url
   url: string,
