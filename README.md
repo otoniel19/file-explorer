@@ -5,9 +5,9 @@
 - installation
 
 ```sh
-  npm install @otoniel19/file-explorer
-	# or
-	npm install github://otoniel19/file-explorer
+ npm install @otoniel19/file-explorer
+ # or
+ npm install github://otoniel19/file-explorer
 ```
 
 - usage
