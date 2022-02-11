@@ -8,7 +8,8 @@ const express = require("express"),
   getFileIcon = require("./file-icon"),
   zipLocal = require("zip-local"),
   flash = require("connect-flash"),
-  session = require("express-session");
+  session = require("express-session"),
+  shelljs = require("shelljs");
 
 //static files
 router.use(express.static(path.join(__dirname, "static"), { index: false }));
@@ -31,8 +32,6 @@ var Lock = "";
 var Hidden = "";
 var Url = "";
 var Target = "";
-//current action
-var action = {};
 var Nav = [];
 
 /*
@@ -51,6 +50,19 @@ const config = function (dir, root, lock, hidden, url, target) {
   Url = url;
   Target = target;
 };
+
+//catch acess denied or no such dir
+setInterval(() => {
+  try {
+    fs.readdirSync(Dir);
+  } catch (e) {
+    logger.error("error on scan dir");
+    if (e.code == "ENOENT")
+      logger.error(`${Dir} dont exists we try to use Root`);
+
+    Dir = Root;
+  }
+});
 
 //remove duplicate "/" from Dir
 const fixDir = () => (Dir = Dir.replace("//", "/"));
@@ -103,7 +115,6 @@ setInterval(() => {
     fs.readdirSync(Dir);
   } catch (e) {
     logger.error("error on scan dir");
-    message = "error on scan dir";
     if (e.code == "ENOENT")
       logger.error(`${Dir} dont exists we try to use Root`);
 
@@ -130,14 +141,12 @@ router.use(async (req, res, next) => {
 });
 
 router.get("/", (req, res) => {
-  action = { action: "open explorer", dir: Dir };
   res.render("explorer", { nav: Nav });
 });
 
 router.get("/create=:type", (req, res) => {
   const { type } = req.params;
   //create file or dir
-  action = { action: "open create", type: type, dir: Dir };
   res.render("create", {
     type: type,
     holderName: `input ${type}name`
@@ -145,14 +154,13 @@ router.get("/create=:type", (req, res) => {
 });
 
 router.post("/save", (req, res) => {
-  const { type, name } = req.body;
+  var { type, name } = req.body;
   //create file
-  action = { action: "save", type: type, name: name, dir: Dir };
+  name = name.match(/[^&|€¢£©®°•√π∆¶×%]/gi).join("");
   if (type == "file") {
     try {
       fs.writeFileSync(`${Dir}/${name}`, "");
       req.flash("successMsg", `file ${name} created`);
-      action = { action: "create", name: name, type: type };
     } catch (e) {
       req.flash("errorMsg", `error on create file ${name}`);
     }
@@ -162,7 +170,6 @@ router.post("/save", (req, res) => {
       //create the dir
       fs.mkdirSync(`${Dir}/${name}`, { recursive: false, force: true });
       req.flash("successMsg", `folder ${name} created`);
-      action = { action: "create", type: type, name: name };
     } catch (e) {
       req.flash("errorMsg", `error on create folder ${name}`);
     }
@@ -174,7 +181,6 @@ router.post("/save", (req, res) => {
 router.get("/cd=:dir", (req, res) => {
   //open dir
   Dir = `${Dir}/${req.params.dir}/`;
-  action = { action: "changeDir", dir: Dir };
   if (global.Url == "") res.redirect("/");
   else res.redirect(global.Url);
 });
@@ -182,7 +188,6 @@ router.get("/cd=:dir", (req, res) => {
 router.get("/upOneDir", async (req, res) => {
   //up a dir
   Dir = Dir + "/../";
-  action = { action: "updir", dir: Dir };
   if (global.Url == "") res.redirect("/");
   else res.redirect(global.Url);
 });
@@ -190,7 +195,6 @@ router.get("/upOneDir", async (req, res) => {
 router.get("/config=:name&:type", (req, res) => {
   const { name, type } = req.params;
   const dir = "/" + Dir + "/" + name;
-  action = { action: "open config", name: name, type: type, dir: dir };
   res.render("config", {
     name: name,
     dir: dir.replace("//", "/"),
@@ -199,32 +203,13 @@ router.get("/config=:name&:type", (req, res) => {
 });
 
 router.post("/rm", (req, res) => {
-  //remove files or folders
-  action = {
-    action: "remove",
-    type: req.body.type,
-    name: req.body.name,
-    dir: Dir
-  };
-  //remove file
-  if (req.body.type == "file") {
-    try {
-      fs.rmSync(`${Dir}/${req.body.name}`);
-      req.flash("successMsg", `file ${req.body.name} removed`);
-    } catch (e) {
-      req.flash("errorMsg", `error on remove file ${req.body.name}`);
-    }
-  } else {
-    //remove dir
-    try {
-      fs.rmSync(`${Dir}/${req.body.name}`, {
-        recursive: true,
-        force: true
-      });
-      req.flash("successMsg", `folder ${req.body.name} removed`);
-    } catch (e) {
-      req.flash(`errorMsg`, `error on remove folder ${req.body.name}`);
-    }
+  //remove
+  const { name, type } = req.body;
+  try {
+    fs.rmSync(`${Dir}/${name}`, { force: true, recursive: true });
+    req.flash("successMsg", `${type} ${name} removed`);
+  } catch (e) {
+    req.flash("errorMsg", `error on remove ${type} ${name}`);
   }
   if (global.Url == "") res.redirect("/");
   else res.redirect(global.Url);
@@ -232,7 +217,6 @@ router.post("/rm", (req, res) => {
 
 router.get("/rename=:old=:newName", (req, res) => {
   const { old, newName } = req.params;
-  action = { action: "rename", oldName: old, newName: newName, dir: Dir };
 
   try {
     //rename the dir or file
@@ -243,14 +227,13 @@ router.get("/rename=:old=:newName", (req, res) => {
     req.flash("errorMsg", `failed on rename ${old} -> ${newName}`);
   }
   //remove old name from Dir
-  Dir = Dir.split(old).join("");
+  Dir = Dir.replace(old, newName);
   if (global.Url == "") res.redirect("/");
   else res.redirect(global.Url);
 });
 
 router.get("/openFile=:name", (req, res) => {
   const { name } = req.params;
-  action = { action: "open file", name: name, dir: Dir };
   res.render("files", {
     name: name,
     content: fs.readFileSync(`${Dir}/${name}`).toString()
@@ -259,7 +242,6 @@ router.get("/openFile=:name", (req, res) => {
 
 router.post("/saveFile", (req, res) => {
   const { name, content } = req.body;
-  action = { action: "save file", name: name, dir: Dir };
   try {
     fs.writeFileSync(`${Dir}/${name}`, content);
     req.flash("successMsg", `file ${name} saved`);
@@ -273,12 +255,6 @@ router.post("/saveFile", (req, res) => {
 //zip
 router.post("/zip", async (req, res) => {
   const { zipName } = req.body;
-  action = {
-    action: "zip",
-    name: zipName,
-    zipName: zipName + ".zip",
-    dir: Dir
-  };
   try {
     await zipLocal.sync
       .zip(`${Dir.replace("//", "/")}/${zipName}`)
@@ -293,8 +269,4 @@ router.post("/zip", async (req, res) => {
   else await res.redirect(global.Url);
 });
 
-const getAction = () => {
-  return action;
-};
-
-module.exports = { getAction, router, config };
+module.exports = { router, config };

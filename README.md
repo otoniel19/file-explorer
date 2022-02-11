@@ -10,6 +10,7 @@
  npm install github://otoniel19/file-explorer
 ```
 
+- avoid using special words
 - usage
 - browse mode
 
