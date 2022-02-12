@@ -32,12 +32,6 @@ app.engine("handlebars", engine({ defaultLayout: "main" }));
 
 fileExp.config("../foo", "../foo/bar", true, false, "/foo", "/bar");
 
-//getCurrentAction
-app.use((req, res, next) => {
-  console.log(fileExp.getAction());
-  next();
-});
-
 app.use("/foo", fileExp.router);
 
 app.listen(3000);
