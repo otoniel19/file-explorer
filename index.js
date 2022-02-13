@@ -111,7 +111,6 @@ router.use(async (req, res, next) => {
 });
 
 router.get("/", (req, res) => {
-  emit = true;
   res.render("explorer", { nav: Nav });
 });
 
