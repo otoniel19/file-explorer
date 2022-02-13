@@ -30,9 +30,9 @@ app.set("views", "./node_modules/@otoniel19/file-explorer/views/browse-mode/");
 app.set("view engine", "handlebars");
 app.engine("handlebars", engine({ defaultLayout: "main" }));
 
-fileExp.config("../foo", "../foo/bar", true, false, "/foo", "/bar");
+fileExp.config("../", "../../home/", false, "/", "/");
 
-app.use("/foo", fileExp.router);
+app.use("/", fileExp.router);
 
 app.listen(3000);
 ```
@@ -45,10 +45,8 @@ app.listen(3000);
 function config(
   //initial dir
   dir: string,
-  //root dir
+  //root dir to catch errors
   root: string,
-  //block acess to root dir
-  lock: boolean,
   //show hidden files
   hidden: boolean,
   //url

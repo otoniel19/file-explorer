@@ -2,7 +2,6 @@ const express = require("express"),
   path = require("path"),
   fs = require("fs"),
   hdbs = require("handlebars"),
-  hdbsHelpers = require("handlebars-helpers")({ handlebars: hdbs }),
   logger = require("@otoniel19/logger"),
   router = express.Router(),
   getFileIcon = require("./file-icon"),
@@ -10,6 +9,8 @@ const express = require("express"),
   flash = require("connect-flash"),
   session = require("express-session"),
   shelljs = require("shelljs");
+
+require("handlebars-helpers")({ handlebars: require("handlebars") });
 
 //static files
 router.use(express.static(path.join(__dirname, "static"), { index: false }));
@@ -28,7 +29,6 @@ router.use(flash());
 
 var Dir = "";
 var Root = "";
-var Lock = "";
 var Hidden = "";
 var Url = "";
 var Target = "";
@@ -36,16 +36,13 @@ var Nav = [];
 
 /*
  * @param {String} dir the initial directory
- * @param {String} root the root directory
- * @param {Boolean} lock block root directory acess
  * @param {Boolean} hidden show hidden files
  * @param {String} url the url to redirect
  * @param {String} target the target url for future select files mode update
  */
-const config = function (dir, root, lock, hidden, url, target) {
+const config = function (dir, root, hidden, url, target) {
   Dir = dir;
   Root = root;
-  Lock = lock;
   Hidden = hidden;
   Url = url;
   Target = target;
@@ -57,70 +54,43 @@ setInterval(() => {
     fs.readdirSync(Dir);
   } catch (e) {
     logger.error("error on scan dir");
-    if (e.code == "ENOENT")
-      logger.error(`${Dir} dont exists we try to use Root`);
+    if (e.code == "ENOENT") logger.error(`${Dir} dont exists`);
 
     Dir = Root;
   }
-});
+}, 0);
 
 //remove duplicate "/" from Dir
 const fixDir = () => (Dir = Dir.replace("//", "/"));
 setInterval(fixDir, 0);
 
-//block root acess
-const lockFileRoot = () => {
-  if (Lock) {
-    //root dir name
-    const lock = Root.split("/").join("").split(".").join("");
-    fs.readdirSync(Dir).forEach((name) => {
-      //dir name
-      const dlock = name.split("/").join("").split(".").join("");
-      if (dlock == lock) {
-        Dir = Root;
-        logger.error(`acess denied cannot leave root directory`);
-      }
-    });
-  }
-};
-
-setInterval(lockFileRoot, 0);
-
 //changeDir
 async function changeDir() {
   Nav = [];
-  var scan = Hidden
-    ? fs.readdirSync(Dir)
-    : fs.readdirSync(Dir).filter((v) => !v.startsWith("."));
-  scan.forEach((name) => {
-    if (fs.statSync(`${Dir}/${name}`).isFile()) {
-      Nav.push({
-        type: "file",
-        name: name,
-        icon: getFileIcon(name, "file")
-      });
-    } else {
-      Nav.push({
-        type: "folder",
-        name: name,
-        icon: getFileIcon(name, "folder")
-      });
-    }
-  });
-}
-
-//catch acess denied or no such dir
-setInterval(() => {
   try {
-    fs.readdirSync(Dir);
+    var scan = Hidden
+      ? fs.readdirSync(Dir)
+      : fs.readdirSync(Dir).filter((v) => !v.startsWith("."));
+    scan.forEach((name) => {
+      if (fs.statSync(`${Dir}/${name}`).isFile()) {
+        Nav.push({
+          type: "file",
+          name: name,
+          icon: getFileIcon(name, "file")
+        });
+      } else {
+        Nav.push({
+          type: "folder",
+          name: name,
+          icon: getFileIcon(name, "folder")
+        });
+      }
+    });
   } catch (e) {
-    logger.error("error on scan dir");
-    if (e.code == "ENOENT")
-      logger.error(`${Dir} dont exists we try to use Root`);
-
+    //if an error the Dir back to the Root
     Dir = Root;
   }
-});
+}
 
 router.use(async (req, res, next) => {
   await changeDir();
@@ -141,6 +111,7 @@ router.use(async (req, res, next) => {
 });
 
 router.get("/", (req, res) => {
+  emit = true;
   res.render("explorer", { nav: Nav });
 });
 
@@ -168,7 +139,7 @@ router.post("/save", (req, res) => {
     //create dir
     try {
       //create the dir
-      fs.mkdirSync(`${Dir}/${name}`, { recursive: false, force: true });
+      fs.mkdirSync(`${Dir}/${name}`, { recursive: true, force: true });
       req.flash("successMsg", `folder ${name} created`);
     } catch (e) {
       req.flash("errorMsg", `error on create folder ${name}`);

@@ -12,7 +12,7 @@ app.set("views", "./views/browse-mode/");
 app.set("view engine", "handlebars");
 app.engine("handlebars", engine({ defaultLayout: "main" }));
 
-exp.config("../", "../../home/", true, false, "/fs", "/");
+exp.config("../", "../../home/", false, "/fs", "/");
 
 app.use("/fs", exp.router);
 app.listen(3000);
