@@ -1,12 +1,6 @@
 const fs = require("fs");
 
-function getCwd() {
-  var cwd = process.cwd();
-  if (cwd[0] == "test.js") cwd = `${cwd}/../`;
-  return cwd;
-}
-
-const fl = fs.readdirSync(getCwd()).filter((o) => !o.includes("tests"));
+const fl = fs.readdirSync(process.cwd()).filter((o) => !o.includes("tests"));
 
 it("check files", () => {
   const expectedFiles = [

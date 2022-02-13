@@ -4,7 +4,7 @@
   "description": "file explorer for express apps",
   "main": "index.js",
   "scripts": {
-    "test": "npx jest --verbose --config=.jest.config.js --rootDir=tests"
+    "test": "npx jest --verbose --config=.jest.config.js --rootDir=."
   },
   "types": "./dist",
   "repository": {
