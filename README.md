@@ -55,3 +55,9 @@ function config(
   target: string
 ): void;
 ```
+
+# tests
+
+```sh
+ npm test
+```
