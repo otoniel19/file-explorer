@@ -1,4 +1,4 @@
-export const router: import("express-serve-static-core").Router;
+export const router: any;
 export function config(
   dir: string,
   root: string,

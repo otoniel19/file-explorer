@@ -2,19 +2,17 @@ const fs = require("fs");
 
 const fl = fs.readdirSync(process.cwd()).filter((o) => !o.includes("tests"));
 
-it("check files", () => {
+describe("Check file-explorer files", () => {
   const expectedFiles = [
-    ".git",
-    "README.md",
-    "dist",
-    "file-icon.js",
     "index.js",
-    ".jest.config.js",
     "package.json",
     "static",
     "tsconfig.json",
+    "lib",
     "views",
     "yarn.lock"
   ];
-  expect(fl).toEqual(expect.arrayContaining(expectedFiles));
+  expectedFiles.forEach((name) => {
+    it(`checking ${name}`, () => expect(fl).toContain(name));
+  });
 });

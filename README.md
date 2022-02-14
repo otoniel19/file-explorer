@@ -25,14 +25,14 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.set("views", "./node_modules/@otoniel19/file-explorer/views/browse-mode/");
+app.set("views", fileExp.browseView);
 
 app.set("view engine", "handlebars");
 app.engine("handlebars", engine({ defaultLayout: "main" }));
 
-fileExp.config("../", "../../home/", false, "/", "/");
+fileExp.browse.config("../", "../../home/", false, "/", "/");
 
-app.use("/", fileExp.router);
+app.use("/", fileExp.browse.router);
 
 app.listen(3000);
 ```
