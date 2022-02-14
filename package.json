@@ -1,6 +1,6 @@
 {
   "name": "@otoniel19/file-explorer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "file explorer for express apps",
   "main": "index.js",
   "scripts": {
