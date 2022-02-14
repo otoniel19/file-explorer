@@ -3,6 +3,5 @@ export function config(
   dir: string,
   root: string,
   hidden: boolean,
-  url: string,
-  target: string
+  url: string
 ): void;
