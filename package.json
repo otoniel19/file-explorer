@@ -6,7 +6,6 @@
   "scripts": {
     "test": "npx jest --verbose --config=.jest.config.js --rootDir=."
   },
-  "types": "./dist",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/otoniel19/file-explorer.git"
@@ -37,9 +36,11 @@
   "keywords": [
     "express",
     "fs",
+    "filesystem",
+    "explorer",
     "file-explorer"
   ],
-  "author": "",
+  "author": "otoniel19",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/otoniel19/file-explorer/issues"
