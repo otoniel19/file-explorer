@@ -21,3 +21,5 @@
 ```sh
  npm test
 ```
+
+- find a bug? create a [issue](https://github.com/otoniel19/file-explorer/issues/new)
